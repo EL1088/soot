@@ -2,7 +2,11 @@
 Machine Learning-based Approximation of Soot Temperature and Volume Fraction Profiles in Combustion Diagnostics
 
 The scripts and output metrics summary are found in the main directory.
+
 soot_proj/
+- datasets/
+- model/
+- testcases/
 - mat_to_excel.py
 - metrics.csv
 - metrics_testcases.csv
