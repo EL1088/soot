@@ -16,7 +16,7 @@ soot_proj/
 		
 Datasets are saved under soot_proj/datasets/ directory and it is references to in the train .py codes.
 
-After training a model, the models .keras and scalers .pkl files are saved in soot_proj/model/ directory for later use for prediction. They are referenced in soot_testcase_predict.py.
+After training a model, the models .keras and scalers .pkl files are saved in soot_proj/model/ directory for later use for prediction. They are referenced to in soot_testcase_predict.py.
 
 For data conversion from .mat to .xlsx use mat_to_excel.py code, with the data files locationt referenced in the code.
 The matlab data title might need to be adjusted based on how it was named on creation, this is referenced in row 13.
