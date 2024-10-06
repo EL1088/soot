@@ -14,7 +14,7 @@ soot_proj/
 - soot_CNN_train.py
 - soot_testcase_predict.py
 		
-Datasets are saved under soot_proj/datasets/ directory and it is references to in the train codes.
+Datasets are saved under soot_proj/datasets/ directory and it is references to in the train .py codes.
 
 After training a model, the models .keras and scalers .pkl files are saved in soot_proj/model/ directory for later use for prediction. They are referenced in soot_testcase_predict.py.
 
