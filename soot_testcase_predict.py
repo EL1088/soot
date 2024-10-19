@@ -16,10 +16,10 @@ from keras.layers import LeakyReLU
 import tensorflow as tf
 
 # Defining paths
-model_path = r'C:/Users/elusi/OneDrive/Desktop/soot_proj/model/CNN_dataset2/trained_model.keras'
-scaler1_path = r'C:/Users/elusi/OneDrive/Desktop/soot_proj/model/CNN_dataset2/scaler_y1.pkl'
-scaler2_path = r'C:/Users/elusi/OneDrive/Desktop/soot_proj/model/CNN_dataset2/scaler_y2.pkl'
-testcase_dir = 'C:/Users/elusi/OneDrive/Desktop/soot_proj/testcases/dataset2+noise/'
+model_path = r'C:/Users/elusi/OneDrive/Desktop/soot_proj/model/CNN/trained_model.keras'
+scaler1_path = r'C:/Users/elusi/OneDrive/Desktop/soot_proj/model/CNN/scaler_y1.pkl'
+scaler2_path = r'C:/Users/elusi/OneDrive/Desktop/soot_proj/model/CNN/scaler_y2.pkl'
+testcase_dir = 'C:/Users/elusi/OneDrive/Desktop/soot_proj/testcases/dataset2differentHeights+noise/'
 testcase_metrics_path = r'C:/Users/elusi/OneDrive/Desktop/soot_proj/metrics_testcases.csv'
 testcase_metrics_df = pd.read_csv(testcase_metrics_path)
 
@@ -61,6 +61,11 @@ y1drops = [1, 2, 3, 4]
 y2drops = [0, 2, 3, 4]
 if any(os.listdir(testcase_dir)):
     for test, testcase in testcases:
+        # Check if the number of pixels in the testcase is larger than what the model was trained on
+        if testcase.shape[0] > trained_model.input_shape[1]:
+            # Trim all pixels larger than what the model was trained on
+            testcase = testcase.iloc[:trained_model.input_shape[1], :]
+            
         # Split data to X and Y1/Y2 and reshape to arrays
         testcase_x = testcase.drop(testcase.columns[xdrops], axis=1, inplace=False).to_numpy().reshape((-1, testcase.shape[0], 3))
         testcase_y1 = testcase.drop(testcase.columns[y1drops], axis=1, inplace=False).to_numpy().reshape((-1, testcase.shape[0], 1))
@@ -77,6 +82,19 @@ if any(os.listdir(testcase_dir)):
         # Inverse transform the predictions and reshape back to 3d (2000,66,1)
         pred_testcase_y1_2d = scaler_y1.inverse_transform(pred_testcase_y1_2d).reshape(n_samples, n_timesteps, 1)
         pred_testcase_y2_2d = scaler_y2.inverse_transform(pred_testcase_y2_2d).reshape(n_samples, n_timesteps, 1)
+        
+        ### ADDED FOR TEST VISUALIZATION - REMOVE ALL PIXELS WHERE RGB ZEROES, USUALLY >~60 ###
+        mask = (testcase_x >= 50).any(axis=2)
+        filtered_indices = mask.flatten()
+        testcase_x = testcase_x[:, filtered_indices]
+        num_indices = testcase_x.shape[1]
+
+        testcase_y1 = testcase_y1[:, :num_indices, :]
+        testcase_y2 = testcase_y2[:, :num_indices, :]
+
+        pred_testcase_y1_2d = pred_testcase_y1_2d[:, :num_indices, :]
+        pred_testcase_y2_2d = pred_testcase_y2_2d[:, :num_indices, :]
+        ### END OF VISUALIZATION ###
         
         # Plot pred vs actual
         plt.figure(figsize=(15, 5))

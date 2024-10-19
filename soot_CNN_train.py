@@ -21,12 +21,11 @@ import random
 import seaborn as sns
 
 # Defining paths
-database = pd.ExcelFile(r'C:/Users/elusi/Downloads/proj/dataset/dataset2.xlsx')
-sheets = database.sheet_names
+database = pd.ExcelFile(r'C:/Users/elusi/Downloads/proj/dataset/dataDifferentHeights2_121024.xlsx')
 metrics_path = r'C:/Users/elusi/Downloads/proj/metrics.csv'
-model_path = r'C:/Users/elusi/Downloads/proj/model/trained_model'
-scaler1_path = r'C:/Users/elusi/Downloads/proj/model/scaler_y1.pkl'
-scaler2_path = r'C:/Users/elusi/Downloads/proj/model/scaler_y2.pkl'
+model_path = r'C:/Users/elusi/Downloads/proj/model/CNN/trained_model'
+scaler1_path = r'C:/Users/elusi/Downloads/proj/model/CNN/scaler_y1.pkl'
+scaler2_path = r'C:/Users/elusi/Downloads/proj/model/CNN/scaler_y2.pkl'
 metrics_df = pd.read_csv(metrics_path)
 
 # Defining callbacks
@@ -42,7 +41,7 @@ reducelearning = ReduceLROnPlateau(monitor='val_loss',
                                    min_lr=0.000001,
                                    verbose=1)
 
-# Defining cross-validations hyperparameters for model fine tuning
+# Defining hyperparameters cross-validations for model fine tuning
 #callbacks = [earlystop, reducelearning]
 #batch_sizes = [1, 32, 10, 5]
 #activations = ['linear', LeakyReLU(alpha=0.01), LeakyReLU(alpha=0.1), 'elu', 'tanh']
@@ -59,6 +58,7 @@ optimizers = ['rmsprop']
 #__________________________________________________________________________________#
 
 # Creating 3d dataframe (10000, 66, 5) from the .xlsx database containing 10,000 worksheets containing (66,5) data each
+sheets = database.sheet_names
 dataframes = {}
 for s in sheets:
     dataframes[s] = database.parse(s)
@@ -121,7 +121,6 @@ test_dataframes = {key: dataframes[key] for key in dataframes_keys[split_ratio:]
 train_dataframes = {key: train_dataframes[key].sort_index() for key in sorted(train_dataframes)}
 test_dataframes = {key: test_dataframes[key].sort_index() for key in sorted(test_dataframes)}
     
-# for simulation only - randomly picking 100 dataframes (out of 8,000 train soots)
 train_df_list = list(train_dataframes.values())
 
 # split train data to X and Y1/Y2
@@ -297,98 +296,36 @@ for act in activations:
             
             # Plot few samples pred vs actual
             # Each plot takes 5 random samples from 500 different ranges of the data, i.e. between 1-500, 501-1000, 1001-1500
-            sample_indices = random.sample(range(500), 5)
-            plt.figure(figsize=(15, 5))
-            # Plot pred_y1 against test_y1 for the selected samples
-            plt.subplot(1, 2, 1)
-            for i in sample_indices:
-                plt.plot(concat_test_y1df[i], label=f'Sample {i} True')
-                plt.plot(pred_y1[i], linestyle='dashed', label=f'Sample {i} Predicted')
-            plt.xlabel('Pixel')
-            plt.ylabel('Soot volume fraction')
-            plt.grid(True, linestyle='--', alpha=0.6)
-            plt.title('Predicted/Actual vol. fraction for ' + str(batch) + ' batches')
-            # Plot pred_y2 against test_y2 for the selected samples
-            plt.subplot(1, 2, 2)
-            for i in sample_indices:
-                plt.plot(concat_test_y2df[i], label=f'Sample {i} True')
-                plt.plot(pred_y2[i], linestyle='dashed', label=f'Sample {i} Predicted')
-            plt.xlabel('Pixel')
-            plt.ylabel('Temperature')
-            plt.grid(True, linestyle='--', alpha=0.6)
-            plt.title('Predicted/Actual Temp. for ' + str(batch) + ' batches')
-            plt.tight_layout()
-            plt.show()
+            # Define a color palette (adjust colors as needed)
+            colors = ['darkred', 'lightcoral', 'darkblue', 'lightskyblue', 'darkgreen', 'lightgreen', 'darkorange', 'lightyellow']
             
-            # Plot few samples pred vs actual
-            sample_indices = random.sample(range(501,1000), 5)
-            plt.figure(figsize=(15, 5))
-            # Plot pred_y1 against test_y1 for the selected samples
-            plt.subplot(1, 2, 1)
-            for i in sample_indices:
-                plt.plot(concat_test_y1df[i], label=f'Sample {i} True')
-                plt.plot(pred_y1[i], linestyle='dashed', label=f'Sample {i} Predicted')
-            plt.xlabel('Pixel')
-            plt.ylabel('Soot volume fraction')
-            plt.grid(True, linestyle='--', alpha=0.6)
-            plt.title('Predicted/Actual vol. fraction for ' + str(batch) + ' batches')
-            # Plot pred_y2 against test_y2 for the selected samples
-            plt.subplot(1, 2, 2)
-            for i in sample_indices:
-                plt.plot(concat_test_y2df[i], label=f'Sample {i} True')
-                plt.plot(pred_y2[i], linestyle='dashed', label=f'Sample {i} Predicted')
-            plt.xlabel('Pixel')
-            plt.ylabel('Temperature')
-            plt.grid(True, linestyle='--', alpha=0.6)
-            plt.title('Predicted/Actual Temp. for ' + str(batch) + ' batches')
-            plt.tight_layout()
-            plt.show()
+            # Sample indices
+            sample_indices = random.sample(range(2000), 5)
             
-            # Plot few samples pred vs actual
-            sample_indices = random.sample(range(1001,1500), 5)
             plt.figure(figsize=(15, 5))
-            # Plot pred_y1 against test_y1 for the selected samples
-            plt.subplot(1, 2, 1)
-            for i in sample_indices:
-                plt.plot(concat_test_y1df[i], label=f'Sample {i} True')
-                plt.plot(pred_y1[i], linestyle='dashed', label=f'Sample {i} Predicted')
-            plt.xlabel('Pixel')
-            plt.ylabel('Soot volume fraction')
-            plt.grid(True, linestyle='--', alpha=0.6)
-            plt.title('Predicted/Actual vol. fraction for ' + str(batch) + ' batches')
-            # Plot pred_y2 against test_y2 for the selected samples
-            plt.subplot(1, 2, 2)
-            for i in sample_indices:
-                plt.plot(concat_test_y2df[i], label=f'Sample {i} True')
-                plt.plot(pred_y2[i], linestyle='dashed', label=f'Sample {i} Predicted')
-            plt.xlabel('Pixel')
-            plt.ylabel('Temperature')
-            plt.grid(True, linestyle='--', alpha=0.6)
-            plt.title('Predicted/Actual Temp. for ' + str(batch) + ' batches')
-            plt.tight_layout()
-            plt.show()
             
-            # Plot few samples pred vs actual
-            sample_indices = random.sample(range(1501,2000), 5)
-            plt.figure(figsize=(15, 5))
             # Plot pred_y1 against test_y1 for the selected samples
             plt.subplot(1, 2, 1)
-            for i in sample_indices:
-                plt.plot(concat_test_y1df[i], label=f'Sample {i} True')
-                plt.plot(pred_y1[i], linestyle='dashed', label=f'Sample {i} Predicted')
+            for idx, i in enumerate(sample_indices):
+                plt.plot(concat_test_y1df[i], color=colors[idx], label=f'Sample {i} True')
+                plt.plot(pred_y1[i], linestyle='dashed', color=colors[idx], label=f'Sample {i} Pred')
             plt.xlabel('Pixel')
             plt.ylabel('Soot volume fraction')
             plt.grid(True, linestyle='--', alpha=0.6)
-            plt.title('Predicted/Actual vol. fraction for ' + str(batch) + ' batches')
+            plt.title('Predicted/Actual Volume fraction')
+            plt.legend()
+            
             # Plot pred_y2 against test_y2 for the selected samples
             plt.subplot(1, 2, 2)
-            for i in sample_indices:
-                plt.plot(concat_test_y2df[i], label=f'Sample {i} True')
-                plt.plot(pred_y2[i], linestyle='dashed', label=f'Sample {i} Predicted')
+            for idx, i in enumerate(sample_indices):
+                plt.plot(concat_test_y2df[i], color=colors[idx], label=f'Sample {i} True')
+                plt.plot(pred_y2[i], linestyle='dashed', color=colors[idx], label=f'Sample {i} Pred')
             plt.xlabel('Pixel')
             plt.ylabel('Temperature')
             plt.grid(True, linestyle='--', alpha=0.6)
-            plt.title('Predicted/Actual Temp. for ' + str(batch) + ' batches')
+            plt.title('Predicted/Actual Temperature')
+            plt.legend()
+            
             plt.tight_layout()
             plt.show()
             
