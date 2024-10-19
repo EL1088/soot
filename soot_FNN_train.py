@@ -24,7 +24,6 @@ import tensorflow as tf
 database = pd.ExcelFile('C:/Users/elusi/Downloads/proj/dataset/dataset1.xlsx')
 metrics_path = r'C:/Users/elusi/Downloads/proj/metrics.csv'
 metrics_df = pd.read_csv(metrics_path)
-sheets = database.sheet_names
 
 # Defining callbacks
 earlystop = EarlyStopping(monitor = 'val_loss',
@@ -56,6 +55,7 @@ optimizers = ['rmsprop']
 #__________________________________________________________________________________#
 
 # Creating 3d dataframe (10000, 66, 5) from the .xlsx database containing 10,000 worksheets containing (66,5) data each
+sheets = database.sheet_names
 dataframes = {}
 for s in sheets:
     dataframes[s] = database.parse(s)
@@ -296,27 +296,35 @@ for act in activations:
             pred_y1 = scaler_y1.inverse_transform(pred_y1_2d).reshape(n_samples_test, n_timesteps, n_features)
             pred_y2 = scaler_y2.inverse_transform(pred_y2_2d).reshape(n_samples_test, n_timesteps, n_features)
             
-            # Plot few samples pred vs actual
+            # Define a color palette
+            colors = ['darkred', 'lightcoral', 'darkblue', 'lightskyblue', 'darkgreen', 'lightgreen', 'darkorange', 'lightyellow']
+
+            # Sample indices
             sample_indices = random.sample(range(2000), 5)
             plt.figure(figsize=(15, 5))
+
             # Plot pred_y1 against test_y1 for the selected samples
             plt.subplot(1, 2, 1)
-            for i in sample_indices:
-                plt.plot(concat_test_y1df[i], label=f'Sample {i} True')
-                plt.plot(pred_y1[i], linestyle='dashed', label=f'Sample {i} Predicted')
+            for idx, i in enumerate(sample_indices):
+                plt.plot(concat_test_y1df[i], color=colors[idx], label=f'Sample {i} True')
+                plt.plot(pred_y1[i], linestyle='dashed', color=colors[idx], label=f'Sample {i} Pred')
             plt.xlabel('Pixel')
             plt.ylabel('Soot volume fraction')
             plt.grid(True, linestyle='--', alpha=0.6)
-            plt.title('Predicted/Actual vol. fraction for ' + str(batch) + ' batches')
+            plt.title('Predicted/Actual Volume fraction')
+            plt.legend()
+
             # Plot pred_y2 against test_y2 for the selected samples
             plt.subplot(1, 2, 2)
-            for i in sample_indices:
-                plt.plot(concat_test_y2df[i], label=f'Sample {i} True')
-                plt.plot(pred_y2[i], linestyle='dashed', label=f'Sample {i} Predicted')
+            for idx, i in enumerate(sample_indices):
+                plt.plot(concat_test_y2df[i], color=colors[idx], label=f'Sample {i} True')
+                plt.plot(pred_y2[i], linestyle='dashed', color=colors[idx], label=f'Sample {i} Pred')
             plt.xlabel('Pixel')
             plt.ylabel('Temperature')
             plt.grid(True, linestyle='--', alpha=0.6)
-            plt.title('Predicted/Actual Temp. for ' + str(batch) + ' batches')
+            plt.title('Predicted/Actual Temperature')
+            plt.legend()
+
             plt.tight_layout()
             plt.show()
             
