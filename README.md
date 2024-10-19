@@ -14,6 +14,7 @@ soot_proj/
 - soot_CNN_train.py
 - soot_testcase_predict.py
 - soot_testcase_predict+gaus_noise.py
+
 `*** Due to files size uploading limitations  ***`
 - Zipped pre-trained models were uploaded instead of the original keras files. Need to extract them if the intend is to load pre-trained models instead of running train.py
 - Zipped databases for training are available in https://drive.google.com/file/d/1RGinFO4QYbCEARnuQwoZUhOMamD4HI64/view?usp=sharing. Need to extract them in the datasets/ directory.
